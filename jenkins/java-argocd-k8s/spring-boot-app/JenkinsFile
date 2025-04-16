@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Build and Test'){
             steps{
-                sh 'cd java-argocd-k8s/spring-boot-app && mvn clean package'
+                sh 'cd jenkins/java-argocd-k8s/spring-boot-app && mvn clean package'
             }
         }
         stage('Sonar Qube Analysis'){
