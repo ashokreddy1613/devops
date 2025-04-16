@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sping-boot-app
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/devops/jenkins/java-argocd-k8s/spring-boot-app/k8s-manifests
+    targetRevision: main
+    path: .        # root folder, or use a subfolder name if manifests are in one
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: spring-boot-app
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
