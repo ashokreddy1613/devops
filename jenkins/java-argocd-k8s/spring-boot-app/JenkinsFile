@@ -20,7 +20,7 @@ pipeline {
         stage('Sonar Qube Analysis'){
                  environment{
                     SONAR_HOST_URL = 'http://localhost:9000'
-                    SONAR_TOKEN = credentials('sonar-token-id')
+                    SONAR_TOKEN = credentials('sonarqube')
                     }
                     steps {
                         withSonarQubeEnv('SonarQube') {
