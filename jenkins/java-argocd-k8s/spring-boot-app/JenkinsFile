@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Sonar Qube Analysis'){
                  environment{
-                    SONAR_URL =  'http://16.170.169.161:9000'
+                    SONAR_URL =  'http://host.docker.internal:9000'
                     SONAR_TOKEN = credentials('sonarqube')
                     }
                     steps {
