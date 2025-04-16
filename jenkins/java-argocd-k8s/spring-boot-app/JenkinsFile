@@ -45,12 +45,11 @@ pipeline {
         }
     }
         stage('Update Manifest Repo') {
-            environment{
             withCredentials([usernamePassword(
             credentialsId: 'github-token',
             usernameVariable: 'GIT_USER',
             passwordVariable: 'GIT_TOKEN'
-        )])}
+        )])
      steps{
             sh '''
                 # Clone the manifest repo
