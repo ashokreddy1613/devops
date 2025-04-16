@@ -7,14 +7,14 @@ pipeline {
     }
      }
     stages{
-        stage('Clean Workspace') {
-    steps {
-        deleteDir() // This deletes everything in the current workspace
-    }
-}
         stage('checkout'){
             steps{
                 git url: 'https://github.com/ashokreddy1613/devops.git', branch: 'main'
+            }
+        }
+        stage('Clean Workspace') {
+            steps {
+                deleteDir() // This deletes everything in the current workspace
             }
         }
         stage('Build and Test'){
