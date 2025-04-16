@@ -18,8 +18,7 @@ pipeline {
             }
         }
         stage('Sonar Qube Analysis'){
-            steps('SonarQube Analysis') {
-                 environment {
+                 environment{
                     SONAR_HOST_URL = 'http://localhost:9000'
                     SONAR_TOKEN = credentials('sonar-token-id')
                     }
@@ -28,7 +27,7 @@ pipeline {
                         sh 'cd jenkins/java-argocd-k8s/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
                         }
                         }
-                    }
+                    
         }
         stage('Build & Push Docker Image'){
             steps {
@@ -50,7 +49,8 @@ pipeline {
             credentialsId: 'github-token',
             usernameVariable: 'GIT_USER',
             passwordVariable: 'GIT_TOKEN'
-        )]) {
+        )]) 
+     steps{
             sh '''
                 # Clone the manifest repo
                 git clone https://$GIT_USER:$GIT_TOKEN@github.com/your-username/k8s-manifests.git
