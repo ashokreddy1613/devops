@@ -6,23 +6,19 @@ pipeline {
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
      }
-
     stages{
-
         stage('checkout'){
             steps{
                 git url: 'https://github.com/ashokreddy1613/devops.git', branch: 'main'
             }
         }
-
         stage('Build and Test'){
             steps{
                 sh 'cd java-argocd-k8s/spring-boot-app && mvn clean package'
             }
         }
-
         stage('Sonar Qube Analysis'){
-            stage('SonarQube Analysis') {
+            steps('SonarQube Analysis') {
                  environment {
                     SONAR_HOST_URL = 'http://localhost:9000'
                     SONAR_TOKEN = credentials('sonar-token-id')
@@ -34,7 +30,7 @@ pipeline {
                         }
                     }
         }
-        stage ('Build & Push Docker Image'){
+        stage('Build & Push Docker Image'){
             steps {
                 script {
                     sh """
@@ -44,13 +40,12 @@ pipeline {
                 sh """
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                     docker push $DOCKER_IMAGE:$IMAGE_TAG
-                """
-                    
+                """    
                 }
             }
         }
     }
-        stage ('Update Manifest Repo') {
+        stage('Update Manifest Repo') {
             withCredentials([usernamePassword(
             credentialsId: 'github-token',
             usernameVariable: 'GIT_USER',
