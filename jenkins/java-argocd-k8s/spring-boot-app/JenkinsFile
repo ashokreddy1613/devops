@@ -2,80 +2,81 @@ pipeline {
 
     agent {
         docker {
-            image 'abhishekf5/maven-abhishek-docker-agent:v1'
+            image 'maven:3.8.6-openjdk-17'
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
      }
+
     stages{
+
         stage('checkout'){
             steps{
                 git url: 'https://github.com/ashokreddy1613/devops.git', branch: 'main'
             }
         }
+
         stage('Build and Test'){
             steps{
-                sh 'cd jenkins/java-argocd-k8s/spring-boot-app && mvn clean package'
+                sh 'cd java-argocd-k8s/spring-boot-app && mvn clean package'
             }
         }
-        stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://51.21.224.113:9000"
-      }
-      steps {
-        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd jenkins/java-argocd-k8s/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
-        }
-      }
-    }
 
-        stage('Build & Push Docker Image'){
-            steps {
-                script {
-                    sh """
-                docker build -t $DOCKER_IMAGE:$IMAGE_TAG .
-            """
-            withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                sh """
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker push $DOCKER_IMAGE:$IMAGE_TAG
-                """    
-                }
-            }
-        }
-    }
-      stage('Update Manifest Repo') {
-    steps {
-        withCredentials([usernamePassword(
-            credentialsId: 'github-token',
-            usernameVariable: 'GIT_USER',
-            passwordVariable: 'GIT_TOKEN'
-        )]) {
-            sh '''
-                # Clone the manifest repo
-                git clone https://$GIT_USER:$GIT_TOKEN@github.com/your-username/k8s-manifests.git
+    //     stage('Sonar Qube Analysis'){
+    //         stage('SonarQube Analysis') {
+    //              environment {
+    //                 SONAR_HOST_URL = 'http://localhost:9000'
+    //                 SONAR_TOKEN = credentials('sonar-token-id')
+    //                 }
+    //                 steps {
+    //                     withSonarQubeEnv('SonarQube') {
+    //                     sh 'cd jenkins/java-argocd-k8s/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
+    //                     }
+    //                     }
+    //                 }
+    //     }
+    //     stage ('Build & Push Docker Image'){
+    //         steps {
+    //             script {
+    //                 sh """
+    //             docker build -t $DOCKER_IMAGE:$IMAGE_TAG .
+    //         """
+    //         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+    //             sh """
+    //                 echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+    //                 docker push $DOCKER_IMAGE:$IMAGE_TAG
+    //             """
+                    
+    //             }
+    //         }
+    //     }
+    // }
+    //     stage ('Update Manifest Repo') {
+    //         withCredentials([usernamePassword(
+    //         credentialsId: 'github-token',
+    //         usernameVariable: 'GIT_USER',
+    //         passwordVariable: 'GIT_TOKEN'
+    //     )]) {
+    //         sh '''
+    //             # Clone the manifest repo
+    //             git clone https://$GIT_USER:$GIT_TOKEN@github.com/your-username/k8s-manifests.git
 
-                # Change to that directory
-                cd k8s-manifests
+    //             # Change to that directory
+    //             cd k8s-manifests
 
-                # Replace the image tag in deployment.yaml
-                sed -i "s|image: jenkins/java-argocd-k8s/spring-boot-app/ultimate-cicd-pipeline:.*|image: jenkins/java-argocd-k8s/spring-boot-app/ultimate-cicd-pipeline:$BUILD_NUMBER|" deployment.yaml
+    //             # Replace the image tag in deployment.yaml
+    //             sed -i "s|image: jenkins/java-argocd-k8s/spring-boot-app/ultimate-cicd-pipeline:.*|image: jenkins/java-argocd-k8s/spring-boot-app/ultimate-cicd-pipeline:$BUILD_NUMBER|" deployment.yaml
 
-                # Configure git user info
-                git config user.email "jenkins@ci.local"
-                git config user.name "Jenkins CI"
+    //             # Configure git user info
+    //             git config user.email "jenkins@ci.local"
+    //             git config user.name "Jenkins CI"
 
-                # Commit and push the changes
-                git add deployment.yaml
-                git commit -m "Update image to version $BUILD_NUMBER"
-                git push origin main
-            '''
-        }
-    }
-}
-
+    //             # Commit and push the changes
+    //             git add deployment.yaml
+    //             git commit -m "Update image to version $BUILD_NUMBER"
+    //             git push origin main
+    //         '''
+    //     }
+    //     }
    
 }
 }
-
-
- 
