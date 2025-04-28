@@ -24,17 +24,19 @@ This guide walks you through setting up an AWS EKS cluster with Fargate profiles
 ```bash
 brew install awscli
 ```
+A command-line tool to manage AWS services like EC2, S3, IAM, EKS, CloudFormation, etc.
 
 ### 1.2 Install kubectl
 ```bash
 brew install kubectl
 ```
+kubectl is the command-line tool to interact with Kubernetes clusters.
 
 ### 1.3 Install eksctl
 ```bash
 brew install eksctl
 ```
-
+eksctl is a command-line tool that makes it easy to create, manage, and delete AWS EKS (Elastic Kubernetes Service) clusters.
 ---
 
 ## 2. Configure AWS CLI
@@ -89,6 +91,22 @@ aws iam create-policy \
   --policy-name AWSLoadBalancerControllerIAMPolicy \
   --policy-document file://iam_policy.json
 ```
+First command links your EKS cluster to an AWS IAM OIDC provider, allowing secure pod-level access to AWS services via IAM roles.
+ You need this if you want to give AWS permissions (like S3, DynamoDB, SQS access) to pods running inside your EKS cluster.
+
+Then Create IAM Policy:
+
+ When you install the AWS Load Balancer Controller (for ALB/ELB Ingress):
+    It needs AWS permissions to create and manage:
+            Elastic Load Balancers (ALB/NLB)
+            Target groups
+            Listener rules
+            Security groups
+    
+    Kubernetes pods cannot directly have AWS permissions.
+    Instead, the pod assumes an IAM Role (using IRSA and OIDC) — this IAM Role must have this policy attached.
+
+        ✅ That's why you create this custom IAM Policy.
 
 ### 6.3 Create Service Account
 ```bash
@@ -99,6 +117,9 @@ eksctl create iamserviceaccount \
   --attach-policy-arn arn:aws:iam::<your-account-id>:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
 ```
+Here creating a service account, and attaching IAM role 
+    So when the Load Balancer Controller pod runs using this service account, it automatically gets AWS permissions without needing access keys!
+    This command sets up the link between a Kubernetes service account and an IAM role, so the Load Balancer Controller pods can securely access AWS APIs.
 
 ### 6.4 Install Controller using Helm
 ```bash
@@ -171,4 +192,4 @@ nodejs-ingress   <none>   *       k8s-nodejs-nodejsin-316c12bb94-2125159329.us-e
 - Use namespaces wisely for Fargate profiles.
 - Monitor ALB Target Group health in AWS Console.
 
-Hap
+Happy Kubernetes-ing
