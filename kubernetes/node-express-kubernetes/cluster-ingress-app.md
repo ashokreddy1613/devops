@@ -6,7 +6,7 @@
 
    A command-line tool to manage AWS services like EC2, S3, IAM, EKS, CloudFormation, etc.
 
-  ``` brew install awscli
+``` bash brew install awscli
 ```
  Install kubectl
 
