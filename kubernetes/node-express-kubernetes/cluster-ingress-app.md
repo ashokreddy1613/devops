@@ -16,6 +16,7 @@
 brew install kubectl
 ```
  Install eksctl
+ 
     eksctl is a command-line tool that makes it easy to create, manage, and delete AWS EKS (Elastic Kubernetes Service) clusters.
 ```
 brew install eksctl
@@ -27,14 +28,13 @@ brew install eksctl
 ```
   aws configure
 ```
-
   You’ll need:
 
-    AWS Access Key
+    AWS Access Key:
 
-    AWS Secret Key
+    AWS Secret Key:
 
-    Region (example: us-east-1)
+    Region (example: us-east-1):
 
 ✅ Now your CLI is connected to AWS.
 
