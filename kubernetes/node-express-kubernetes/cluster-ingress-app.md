@@ -1,20 +1,101 @@
+![alt text](image-1.png)
+
 # Step-by-Step Guide: Deploy a Node.js App to EKS with Fargate and ALB
 
-This guide walks you through setting up an AWS EKS cluster with Fargate profiles, installing the AWS Load Balancer Controller, deploying a Node.js app, and accessing it publicly via ALB.
+## Build and Deploy an autoscaling Node.js and MongoDB API using Docker, and Kubernetes.
+
+### Containerization and orchestration have become vital in modern application development for efficient deployment and management of scalable applications. Leading the pack, Docker and Kubernetes provide a powerful combination, enabling seamless packaging, deployment, and scaling of applications.
+
+### In this tutorial, Specifically, we will focus on building and deploying an autoscaling Todo API built with Node.js, Express.js, and MongoDB. We’ll explore the step-by-step process of setting up a local Kubernetes environment, containerizing the Node.js application using Docker, and configuring a Kubernetes autoscaling deployment for our application
+
+
+## Prerequisites:
+ 1. Node.js :  Ensure that you have Node.js installed on your machine.
+ 2. Docker : Install Docker on your machine to containerize and manage your application.
+ 3. Kubernetes: make sure to familiarize yourself with the basic components of Kubernetes. 
+ 4. AWS ECR : AWS image registry that helps to storage the docker image
+ 5. AWS EKS : Kubernetes cluster where we deploy node application.  
+ 6. Kubectl : install Kubectl, a command line tool for communicating with a Kubernetes  
+    cluster using the Kubernetes API.
+
+
+First, clone the repository or simple node app ready.
+
+
+Next, let’s containerize our app using Docker. A Dockerfile is a text file that contains a set of instructions used to build a Docker image. It defines the steps needed to create a self-contained environment for running your application.
+
+## Build and push image to AWS ECR Registry
+
+In order for the Kubernetes cluster to pull the Docker image of our application during deployment, we need to make the image accessible. This can be done in various ways, one way is by pushing the docker image to a ECR registry, which can be a public, private, or local registry.
+
+ To do that, Make sure you have installed:
+
+ 1.AWS CLI (v2 recommended)
+
+ 2.Docker installed and running
+
+ 3.AWS CLI configured with your credentials:
+
+
+## 1. Configure AWS CLI
+```bash
+aws configure
+```
+Provide:
+- AWS Access Key
+- AWS Secret Key
+- Region (example: `us-east-1`)
+
+✅ Now your CLI is connected to AWS.
+
+## 2. Create ECR Repository
+
+ ```bash 
+ aws ecr create-repository --repository-name test-kuber --region your-region 
+ ```
+
+## 3. Authenticate Docker to ECR 
+ 
+ ```bash 
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS 
+    --password-stdin <Account-ID>.dkr.ecr.us-east-1.amazonaws.com
+```
+
+## 4. lets build the image and tag it 
+ 
+  ### Build a Docker image 
+
+  ```bash
+docker build -t kubernetes-app .
+```
+
+  ### Tag image for ECR
+
+   ``` bash 
+   docker tag "image":latest <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/ 
+      "ECR Repository":latest 
+   ```
+
+## 5. Push to ECR
+
+  ```bash 
+  docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/"ECR Repo":latest
+```
+
+**This guide walks you through setting up an AWS EKS cluster with Fargate profiles, installing the AWS Load Balancer Controller, deploying a Node.js app, and accessing it publicly via ALB.**
 
 ---
 
 ## Table of Contents
 
 - [1. Install CLI Tools](#1-install-cli-tools)
-- [2. Configure AWS CLI](#2-configure-aws-cli)
-- [3. Create EKS Cluster with Fargate](#3-create-eks-cluster-with-fargate)
-- [4. Create Fargate Profile](#4-create-fargate-profile)
-- [5. Connect kubectl to EKS](#5-connect-kubectl-to-eks)
-- [6. Install AWS Load Balancer Controller](#6-install-aws-load-balancer-controller)
-- [7. Create Kubernetes Resources for Node.js App](#7-create-kubernetes-resources-for-nodejs-app)
-- [8. Apply Kubernetes Manifests](#8-apply-kubernetes-manifests)
-- [9. Access Node.js App via ALB](#9-access-nodejs-app-via-alb)
+- [2. Create EKS Cluster with Fargate](#3-create-eks-cluster-with-fargate)
+- [3. Create Fargate Profile](#4-create-fargate-profile)
+- [4. Connect kubectl to EKS](#5-connect-kubectl-to-eks)
+- [5. Install AWS Load Balancer Controller](#6-install-aws-load-balancer-controller)
+- [6. Create Kubernetes Resources for Node.js App](#7-create-kubernetes-resources-for-nodejs-app)
+- [7. Apply Kubernetes Manifests](#8-apply-kubernetes-manifests)
+- [8. Access Node.js App via ALB](#9-access-nodejs-app-via-alb)
 
 ---
 
@@ -37,22 +118,10 @@ kubectl is the command-line tool to interact with Kubernetes clusters.
 brew install eksctl
 ```
 eksctl is a command-line tool that makes it easy to create, manage, and delete AWS EKS (Elastic Kubernetes Service) clusters.
----
-
-## 2. Configure AWS CLI
-```bash
-aws configure
-```
-Provide:
-- AWS Access Key
-- AWS Secret Key
-- Region (example: `us-east-1`)
-
-✅ Now your CLI is connected to AWS.
 
 ---
 
-## 3. Create EKS Cluster with Fargate
+## 2. Create EKS Cluster with Fargate
 ```bash
 eksctl create cluster --name nodejs-cluster --region us-east-1 --fargate
 ```
@@ -60,7 +129,7 @@ Creates EKS cluster, VPC, subnets, route tables, IAM roles, and a default Fargat
 
 ---
 
-## 4. Create Fargate Profile
+## 3. Create Fargate Profile
 ```bash
 eksctl create fargateprofile --cluster nodejs-cluster --name nodejs-profile --namespace nodejs
 ```
@@ -68,7 +137,7 @@ eksctl create fargateprofile --cluster nodejs-cluster --name nodejs-profile --na
 
 ---
 
-## 5. Connect kubectl to EKS
+## 4. Connect kubectl to EKS
 ```bash
 aws eks update-kubeconfig --region us-east-1 --name nodejs-cluster
 ```
@@ -76,14 +145,14 @@ aws eks update-kubeconfig --region us-east-1 --name nodejs-cluster
 
 ---
 
-## 6. Install AWS Load Balancer Controller
+## 5. Install AWS Load Balancer Controller
 
-### 6.1 Create OIDC Provider
+### 5.1 Create OIDC Provider
 ```bash
 eksctl utils associate-iam-oidc-provider --cluster nodejs-cluster --approve
 ```
 
-### 6.2 Create IAM Policy
+### 5.2 Create IAM Policy
 ```bash
 curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
 
@@ -107,7 +176,7 @@ Then Create IAM Policy:
 
         ✅ That's why you create this custom IAM Policy.
 
-### 6.3 Create Service Account
+### 5.3 Create Service Account
 ```bash
 eksctl create iamserviceaccount \
   --cluster nodejs-cluster \
@@ -120,7 +189,7 @@ Here creating a service account, and attaching IAM role
     So when the Load Balancer Controller pod runs using this service account, it automatically gets AWS permissions without needing access keys!
     This command sets up the link between a Kubernetes service account and an IAM role, so the Load Balancer Controller pods can securely access AWS APIs.
 
-### 6.4 Install Controller using Helm
+### 5.4 Install Controller using Helm
 ```bash
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
@@ -138,7 +207,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
 
 ---
 
-## 7. Create Kubernetes Resources for Node.js App
+## 6. Create Kubernetes Resources for Node.js App
 
 - `deployment.yaml`: Pulls Node.js image from ECR.
 - `service.yaml`: Exposes app inside the cluster.
@@ -146,7 +215,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
 
 ---
 
-## 8. Apply Kubernetes Manifests
+## 7. Apply Kubernetes Manifests
 ```bash
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
@@ -160,7 +229,7 @@ kubectl apply -f k8s/ingress.yaml
 
 ---
 
-## 9. Access Node.js App via ALB
+## 8. Access Node.js App via ALB
 ```bash
 kubectl get ingress nodejs-ingress -n nodejs
 ```

@@ -34,13 +34,17 @@ In order for the Kubernetes cluster to pull the Docker image of our application 
  3.AWS CLI configured with your credentials:
 
 
- ```bash aws configure ```
+ ```bash 
+ aws configure 
+ ```
 
-    (Enter your AWS Access Key, Secret Key, Region)
+   (Enter your AWS Access Key, Secret Key, Region)
 
 ## Create ECR Repository
 
- ```bash aws ecr create-repository --repository-name test-kuber --region your-region ```
+ ```bash 
+ aws ecr create-repository --repository-name test-kuber --region your-region 
+ ```
 
 ## Authenticate Docker to ECR 
  
@@ -59,11 +63,13 @@ docker build -t kubernetes-app .
 
   ### Tag image for ECR
 
-   ``` bash docker tag "image":latest <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/ 
+   ``` bash 
+   docker tag "image":latest <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/ 
       "ECR Repository":latest 
    ```
 
 ## Push to ECR
 
-  ```bash docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/"ECR Repo":latest
+  ```bash 
+  docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/"ECR Repo":latest
 ```
