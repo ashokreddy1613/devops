@@ -21,31 +21,6 @@ First, clone the repository or simple node app ready.
 
 Next, let’s containerize our app using Docker. A Dockerfile is a text file that contains a set of instructions used to build a Docker image. It defines the steps needed to create a self-contained environment for running your application.
 
-## Dockerfile 
-
-``` bash 
-#Use official Node.js base image
-FROM node:23-slim
-
-#Create  app directory
-WORKDIR /app 
-
-#Copy dependencies to the working directory
-COPY package*.json ./
-
-#Install app dependecies
-RUN npm install 
-
-#Copy rest of app code into container
-COPY . .
-
-#Expose the port on which the application will run
-EXPOSE 8080
-
-#Start the app
-CMD [ "node", "app.js" ] ```
-
-
 ## Build and push image to AWS ECR Registry
 
 In order for the Kubernetes cluster to pull the Docker image of our application during deployment, we need to make the image accessible. This can be done in various ways, one way is by pushing the docker image to a ECR registry, which can be a public, private, or local registry.
@@ -59,27 +34,36 @@ In order for the Kubernetes cluster to pull the Docker image of our application 
  3.AWS CLI configured with your credentials:
 
 
- ``` bash aws configure ```
+ ```bash aws configure ```
 
     (Enter your AWS Access Key, Secret Key, Region)
 
 ## Create ECR Repository
 
- ``` bash aws ecr create-repository --repository-name test-kuber --region your-region ```
+ ```bash aws ecr create-repository --repository-name test-kuber --region your-region ```
 
 ## Authenticate Docker to ECR 
  
- ``` bash aws ecr get-login-password --region us-east-1 | docker login --username AWS 
+ ```bash 
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS 
     --password-stdin 123456789012(enter you aws account here).dkr.ecr.us-east-1.amazonaws.com
+```
+
 ## lets build the image and tag it 
  
-  ## Build a Docker image 
-   ``` bash docker build -t kubernetes-app . ```
+  ### Build a Docker image 
 
-  ## Tag image for ECR
+  ```bash
+docker build -t kubernetes-app .
+```
+
+  ### Tag image for ECR
 
    ``` bash docker tag "image":latest <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/ 
-      "ECR Repository":latest ```
+      "ECR Repository":latest 
+   ```
 
 ## Push to ECR
-   docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/"ECR Repo":latest
+
+  ```bash docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/"ECR Repo":latest
+```
