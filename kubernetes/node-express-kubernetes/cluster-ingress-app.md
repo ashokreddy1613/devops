@@ -5,7 +5,6 @@
  Install awscli
 
    A command-line tool to manage AWS services like EC2, S3, IAM, EKS, CloudFormation, etc.
-
 ```
  bash brew install awscli
 ```
@@ -13,19 +12,19 @@
 
   kubectl is the command-line tool to interact with Kubernetes clusters.
 
-  ``` brew install kubectl
+```
+brew install kubectl
 ```
  Install eksctl
-
     eksctl is a command-line tool that makes it easy to create, manage, and delete AWS EKS (Elastic Kubernetes Service) clusters.
-
- ``` brew install eksctl
+```
+brew install eksctl
 ```
 ## Step2: Configure AWS CLI
 
   Run this and enter your credentials:
 
-  ```
+```
   aws configure
 ```
 
@@ -44,7 +43,8 @@
   
   Now use eksctl to create cluster with Fargate profile
 
- ``` eksctl create cluster --name nodejs-cluster --region us-east-1 --fargate
+```
+eksctl create cluster --name nodejs-cluster --region us-east-1 --fargate
 ```
    This will create EKS cluster, VPC, Subnets, Route tables automatically, a default Fargate Profile and setup IAM roles
 
@@ -59,7 +59,7 @@ eksctl create fargateprofile --cluster nodejs-cluster --name nodejs-profile --na
 
  (Usually happens automatically if you used eksctl create cluster, but you can manually update kubeconfig):
 
- ```
+```
 aws eks update-kubeconfig --region us-east-1 --name nodejs-cluster
 ```
   This command prepares your local kubectl to talk to your AWS EKS cluster easily.
@@ -70,7 +70,7 @@ aws eks update-kubeconfig --region us-east-1 --name nodejs-cluster
 ### 2.1 Add IAM Policy for ALB Controller
 
  First create IAM OIDC provider:
- ```
+```
   eksctl utils associate-iam-oidc-provider --cluster your-cluster-name --approve
 ```
 
@@ -79,7 +79,8 @@ aws eks update-kubeconfig --region us-east-1 --name nodejs-cluster
 
   Then create IAM Policy 
   
-  ``` curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+```
+curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
 
 aws iam create-policy \
   --policy-name AWSLoadBalancerControllerIAMPolicy \
