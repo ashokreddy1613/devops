@@ -3,7 +3,6 @@ FROM node:23-slim
 
 #Create  app directory
 WORKDIR /app 
-
 #Copy dependencies to the working directory
 COPY package*.json ./
 
