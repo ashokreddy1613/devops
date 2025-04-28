@@ -1,5 +1,4 @@
 # Step-by-Step Guide: Deploy a Node.js App to EKS with Fargate and ALB
-
 ![alt text](image-1.png)
 
 
@@ -235,14 +234,17 @@ kubectl apply -f k8s/ingress.yaml
 kubectl get ingress nodejs-ingress -n nodejs
 ```
 
+
 Example output:
 ```plaintext
 NAME             CLASS    HOSTS   ADDRESS                                                                PORTS   AGE
 nodejs-ingress   <none>   *       k8s-nodejs-nodejsin-316c12bb94-2125159329.us-east-1.elb.amazonaws.com   80      30m
-```
 
+```
 ✅ Open the `ADDRESS` (ALB DNS name) in your browser.
 ✅ Your Node.js app is now LIVE! 🎉
+
+![alt text](image.png)
 
 ---
 
