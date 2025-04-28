@@ -101,10 +101,9 @@ Then Create IAM Policy:
             Elastic Load Balancers (ALB/NLB)
             Target groups
             Listener rules
-            Security groups
-    
-    Kubernetes pods cannot directly have AWS permissions.
-    Instead, the pod assumes an IAM Role (using IRSA and OIDC) — this IAM Role must have this policy attached.
+            Security groups  
+  Kubernetes pods cannot directly have AWS permissions.
+  Instead, the pod assumes an IAM Role (using IRSA and OIDC) — this IAM Role must have this policy attached.
 
         ✅ That's why you create this custom IAM Policy.
 
