@@ -23,7 +23,8 @@ Next, let’s containerize our app using Docker. A Dockerfile is a text file tha
 
 ## Dockerfile 
 
-``` #Use official Node.js base image
+``` bash 
+#Use official Node.js base image
 FROM node:23-slim
 
 #Create  app directory
@@ -44,6 +45,7 @@ EXPOSE 8080
 #Start the app
 CMD [ "node", "app.js" ] ```
 
+
 ## Build and push image to AWS ECR Registry
 
 In order for the Kubernetes cluster to pull the Docker image of our application during deployment, we need to make the image accessible. This can be done in various ways, one way is by pushing the docker image to a ECR registry, which can be a public, private, or local registry.
@@ -56,7 +58,9 @@ In order for the Kubernetes cluster to pull the Docker image of our application 
 
  3.AWS CLI configured with your credentials:
 
+
  ``` bash aws configure ```
+
     (Enter your AWS Access Key, Secret Key, Region)
 
 ## Create ECR Repository
