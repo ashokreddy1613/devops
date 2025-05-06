@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copy source code and build the app
 COPY . .
+
 RUN mvn clean package 
 
 # Stage 2: Run using OpenJDK
