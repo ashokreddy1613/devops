@@ -271,3 +271,247 @@ Shared Libraries allow reuse of common pipeline code across multiple projects.
 @Library('my-shared-lib') _
 ```
 - Define reusable `vars/*.groovy` and `src/*.groovy` files in the library repo
+
+# Jenkins CI/CD Interview Questions and Best Practice Answers
+
+## 1. How would you create a Jenkins pipeline to build, test, and deploy a Java application?
+
+Use a declarative Jenkinsfile stored in the root of your Git repo:
+
+```groovy
+pipeline {
+  agent any
+  tools { maven 'maven3' }
+  stages {
+    stage('Build') {
+      steps { sh 'mvn clean compile' }
+    }
+    stage('Test') {
+      steps { sh 'mvn test' }
+    }
+    stage('Package') {
+      steps { sh 'mvn package' }
+    }
+    stage('Deploy') {
+      steps { sh './deploy.sh' }
+    }
+  }
+}
+```
+
+## 2. Describe how you would implement a Jenkins pipeline using a Jenkinsfile stored in the source code repository.
+- Create a new Pipeline job.
+- Select "Pipeline script from SCM".
+- Choose Git and provide the repository URL.
+- Specify the branch and path to Jenkinsfile (usually root).
+- Jenkins automatically executes the pipeline from that file.
+
+## 3. How would you set up a Multibranch Pipeline to automatically create jobs for each branch in a Git repository?
+- Create a new Multibranch Pipeline job.
+- Configure the Git repo under "Branch Sources".
+- Add credentials if required.
+- Jenkins scans all branches containing a Jenkinsfile and creates jobs per branch.
+
+## 4. How can you configure a Jenkins pipeline to run multiple stages in parallel?
+
+```groovy
+stage('Tests') {
+  parallel {
+    stage('Unit Tests') { steps { sh 'mvn test' } }
+    stage('Integration Tests') { steps { sh 'mvn verify -P integration' } }
+  }
+}
+```
+
+## 5. How would you configure a Jenkins job to trigger a build based on changes in a Git repository?
+- Enable "GitHub hook trigger for GITScm polling" in job config.
+- Set up a webhook in GitHub to notify Jenkins on changes.
+- Or use "Poll SCM" with cron syntax (e.g., `H/5 * * * *`).
+
+## 6. Describe how you would set up a Jenkins job that accepts parameters from the user before running the build.
+
+```groovy
+parameters {
+  string(name: 'ENV', defaultValue: 'dev', description: 'Target environment')
+}
+```
+
+Usage: `sh "./deploy.sh ${params.ENV}"`
+
+## 7. How would you configure Jenkins to send an email notification upon build completion, only if the build fails?
+
+```groovy
+post {
+  failure {
+    mail to: 'devops@company.com',
+         subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+         body: "Check details: ${env.BUILD_URL}"
+  }
+}
+```
+
+## 8. How can you archive and publish build artifacts in Jenkins for later use or download?
+
+```groovy
+archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+```
+
+## 9. How do you securely manage and use credentials (such as API keys or SSH keys) within Jenkins jobs?
+
+```groovy
+withCredentials([string(credentialsId: 'api-key-id', variable: 'API_KEY')]) {
+  sh 'curl -H "Authorization: Bearer $API_KEY" ...'
+}
+```
+
+## 10. How would you pass and use environment variables within a Jenkins pipeline?
+
+```groovy
+environment {
+  DEPLOY_ENV = 'prod'
+}
+steps {
+  sh 'echo Deploying to $DEPLOY_ENV'
+}
+```
+
+## 11. Describe how you would configure Jenkins to use multiple build agents for distributed builds.
+- Add and configure Jenkins agents.
+- Assign labels to agents.
+- Use `agent { label 'docker' }` for specific steps or stages.
+
+## 12. How can you ensure that a particular job runs on a specific Jenkins agent or a group of agents?
+
+```groovy
+pipeline {
+  agent { label 'linux' }
+}
+```
+
+## 13. How would you configure Jenkins to build and deploy Docker images?
+
+```groovy
+stage('Build Docker Image') {
+  steps {
+    script {
+      def app = docker.build("myapp:${BUILD_NUMBER}")
+      docker.withRegistry('', 'dockerhub-cred') {
+        app.push()
+      }
+    }
+  }
+}
+```
+
+## 14. A pipeline stage intermittently fails due to network issues. How would you add retry logic to handle such failures?
+
+```groovy
+retry(3) {
+  sh 'curl -f http://unstable-service || exit 1'
+}
+```
+
+## 15. How would you identify and install necessary plugins for Jenkins to support a specific build tool or technology?
+- Navigate to "Manage Jenkins" → "Plugin Manager".
+- Search and install relevant plugins (e.g., Maven Integration Plugin).
+
+## 16. Describe how you would use Shared Libraries to reuse code across multiple Jenkins pipelines.
+- Create a Git repo with `/vars` and `/src` directories.
+- Register the library under "Global Shared Libraries".
+- Use in Jenkinsfile:
+
+```groovy
+@Library('shared-lib') _
+myReusableStep()
+```
+
+## 17. How can you manage user permissions and secure your Jenkins instance?
+- Enable "Matrix-based security" under global settings.
+- Configure roles via "Role-based Authorization Strategy Plugin".
+- Restrict anonymous access.
+
+## 18. What strategy would you use to back up Jenkins configurations and jobs, and how would you restore them?
+- Backup `$JENKINS_HOME` directory regularly.
+- Include `jobs/`, `config.xml`, `credentials.xml`.
+- Restore by copying files to a fresh Jenkins install.
+
+## 19. How would you visualize and monitor the progress of your Jenkins pipelines?
+- Use **Blue Ocean Plugin** or **Pipeline Stage View**.
+- Monitor logs and artifacts under each build run.
+
+## 20. How can you integrate test reports (e.g., JUnit, NUnit) into Jenkins to display test results?
+
+```groovy
+junit 'target/surefire-reports/*.xml'
+```
+
+## 21. How do you configure Jenkins to automatically discover and run pipelines defined in source control?
+- Use **Multibranch Pipeline** or **GitHub Organization** job type.
+- Jenkins auto-detects branches and Jenkinsfile definitions.
+
+## 22. What steps would you take to manage long-running jobs that might time out or exceed resource limits?
+
+```groovy
+timeout(time: 30, unit: 'MINUTES') {
+  sh './heavy-task.sh'
+}
+```
+
+- Monitor CPU/memory via agent-level tools.
+
+## 23. How would you set up a build promotion strategy in Jenkins to promote builds through different stages (e.g., Dev, QA, Prod)?
+- Use build parameters to select environments.
+- Tag or mark a build after successful QA.
+- Optionally use **Promoted Builds Plugin**.
+
+## 24. Describe how you would set up Jenkins to trigger builds based on GitHub pull requests.
+- Install **GitHub Branch Source Plugin**.
+- Configure webhook in GitHub.
+- Jenkins creates PR-specific jobs (Change Request builds).
+
+## 25. How would you troubleshoot and debug a failing Jenkins pipeline?
+- Check **Console Output** logs.
+- Use `echo`, `printenv`, or `set -x` in shell steps.
+- Re-run with verbose build flags: `mvn -X`, `npm --verbose`.
+
+## 26. How can you use Job DSL to automate the creation and configuration of Jenkins jobs?
+
+```groovy
+job('my-java-app') {
+  scm {
+    git('https://github.com/org/repo.git')
+  }
+  triggers {
+    scm('H/5 * * * *')
+  }
+  steps {
+    maven('clean install')
+  }
+}
+```
+
+## 27. How would you configure a matrix build in Jenkins to test an application across multiple environments or configurations?
+
+```groovy
+matrix {
+  axes {
+    axis {
+      name 'OS'
+      values 'ubuntu', 'windows'
+    }
+  }
+  stages {
+    stage('Test') {
+      steps {
+        sh 'run-tests.sh'
+      }
+    }
+  }
+}
+```
+
+## 28. What measures would you take to secure sensitive information within your Jenkins pipeline scripts?
+- Use **Jenkins Credentials Manager**.
+- Avoid echoing or printing secrets.
+- Use `withCredentials {}` blocks.
+- Mask sensitive outputs using `echo "***"` or `set +x`.
