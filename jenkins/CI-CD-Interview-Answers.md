@@ -96,20 +96,22 @@ The deployment process includes:
 **GitOps + CI/CD Based**
 
 We follow a GitOps-driven CI/CD process to move code across environments — from dev → staging → pre-prod → prod.
+
 Code is developed and tested in feature branches and then merged into the appropriate environment-tracking branch:
-feature → triggers deployment to dev
-main → goes to staging
-release → deployed to pre-prod
+- feature → triggers deployment to dev
+- main → goes to staging
+- release → deployed to pre-prod
+  
 For moving code to the next environment, we do:
-Merge the branch upward (e.g., main into release)
-Use Jenkins to build the app, tag the Docker image with the commit SHA, and push it to AWS ECR
-Update the relevant GitOps values.yaml file (e.g., values-preprod.yaml or values-prod.yaml) with that exact image tag
+- Merge the branch upward (e.g., main into release)
+- Use Jenkins to build the app, tag the Docker image with the commit SHA, and push it to AWS ECR
+- Update the relevant GitOps values.yaml file (e.g., values-preprod.yaml or values-prod.yaml) with that exact image tag
 ArgoCD automatically syncs the change to the target environment
 
 This approach ensures that we:
- Promote the exact tested image
- Have full traceability through Git history
- Keep environments fully declarative and auditable
+- Promote the exact tested image
+- Have full traceability through Git history
+- Keep environments fully declarative and auditable
 
 For non-GitOps: promote image manually via Helm or kubectl
  We build and tag the Docker image in Jenkins, push it to the registry, and then use environment-specific pipelines or scripts (like Helm or kubectl) to deploy it to the next environment.
