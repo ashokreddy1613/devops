@@ -626,4 +626,4 @@ For etcd, I use the etcdctl snapshot feature or Velero if I want cluster-wide di
 [Answer needed]
 
 ### 75. If control plane goes down what happens to worker nodes?
-If the Kubernetes control plane goes down, the worker nodes and the containers running on them will continue to operate, but no new Pods can be scheduled, and no cluster changes (like deployments or scaling) can be made. The cluster becomes static until the control plane is restored.
+If the Kubernetes control plane goes down, the worker nodes and the containers running on them will continue to operate, but no new Pods can be scheduled, and no cluster changes (like deployments or scaling) can be made. The cluster becomes static until the control plane is restored. 
