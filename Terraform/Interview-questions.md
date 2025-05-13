@@ -823,3 +823,139 @@ resource "aws_instance" "example" {
 ```bash
 terraform import aws_instance.example i-1234567890abcdef
 ```
+
+### 1. Suppose you run "terraform apply" and accidentally delete resources —
+how would you recover?
+
+If terraform apply accidentally deletes resources, I immediately stop further executions, 
+investigate what was destroyed, and recover using backups, version control, or by reimporting 
+existing infrastructure. My goal is to restore state safely while avoiding permanent data loss 
+or service disruption."
+
+1. Analyze What Was Deleted
+  Review the Terraform output: it logs all resource deletions
+  ```bash
+   terraform show
+   terraform plan
+```
+2. Recover from State File Backup 
+  Most backends like S3 automatically version the terraform.tfstate file
+
+3. Reimport Resources If Needed
+If resources still exist outside of Terraform (not destroyed in reality), I re-import them.
+  ```bash
+  terraform import aws_instance.example i-0abcd1234efgh5678
+```
+  Rebuilds the Terraform state without recreating the resource.
+4. Use Git to Roll Back Code
+  Checkout the last known good .tf file version:
+
+### How do you troubleshoot a failing Terraform plan?
+1. Read the Exact Error Message
+  ✅ Terraform is very descriptive. Common failures include:
+
+    Syntax errors
+    Provider version mismatch
+    Missing variables
+    Invalid resource references
+    API errors from the cloud provider (e.g., AWS, Azure)
+2. Validate the Configuration
+  `terraform validate`
+  Catches syntax errors, typos, and bad expressions
+  Useful after recent module or variable changes
+
+  ✅ Run this before plan to detect structural problems
+3. Ensure All Required Variables Are Provided
+  Terraform will fail if required inputs are missing
+
+4. Check Cloud Provider Authentication & Permissions
+  Many plan failures are due to missing or expired credentials.
+  `aws sts get-caller-identity`
+5. Check Backend Configuration (if using remote state)
+  If using S3, GCS, or Terraform Cloud:
+  Ensure backend is configured correctly in backend block
+  Make sure remote state locking is working (e.g., DynamoDB in AWS)
+6. Refresh the State
+  Sometimes stale state can cause plan failures:
+  `terraform refresh`
+  ✅ This syncs Terraform’s local state with the actual infrastructure
+
+### How would you use Terraform workspaces for multiple environments
+1. Syntax Validation
+  `terraform validate`
+  ✅ Checks for syntax errors, missing arguments, or invalid references.
+2. Dry-Run Plan Preview
+  `terraform plan`
+  ✅ Shows exactly what changes Terraform intends to make:
+    Adds
+    Deletes
+    Modifications
+
+### Your Terraform state file got corrupted — what would be your action
+plan?
+
+ If the Terraform state file is corrupted, I immediately stop any further Terraform operations 
+ to avoid making the problem worse. Then I restore from a recent backup (or versioned remote 
+ backend like S3), revalidate state integrity, and, if necessary, reimport live resources to
+  rebuild the state safely."
+
+1. Immediately Stop Further Applies
+    Prevent all team members or CI jobs from running terraform plan or apply
+    If using Git, lock the main branch or disable pipeline triggers temporarily
+
+  ✅ This ensures the corruption doesn’t spread or cause accidental deletions
+
+2. Restore from Backup (If Using Remote Backend)
+3. If No Backup Is Available: Rebuild Using terraform import
+ Use terraform import to bring existing cloud resources back under management
+4. Validate State After Recovery
+  `terraform plan`
+### How would you safely manage sensitive variables like passwords and API keys in Terraform?
+I manage sensitive variables in Terraform using secure input methods, encryption-aware backends,
+and secret management systems like AWS Secrets Manager. I avoid hardcoding secrets in .tf files
+or state whenever possible, and apply least-privilege access controls to limit exposure.
+1. Mark Variables as Sensitive in variables.tf
+```bash
+  variable "db_password" {
+    description = "RDS master password"
+    type        = string
+    sensitive   = true
+  }
+```
+Prevents the password from being shown in CLI output or logs.
+
+2. Do NOT Hardcode Secrets in .tf or .tfvars
+3. Use Encrypted Remote Backends for State Storage
+4. Use Secret Management Tools
+Instead of managing raw secrets in Terraform, use external tools:
+Keeps the actual secret in AWS-managed storage, not in .tfvars or tfstate.
+
+###  Terraform execution is very slow with many modules — how would you
+optimize it?
+To speed up Terraform execution with many modules, I increase parallelism, skip refresh 
+when safe, use targeted applies during dev, and split infrastructure into smaller root modules.
+ I also reduce duplicate data sources and monitor slow modules using logs or plan profiling 
+ tools."
+### How would you perform drift detection between infrastructure and
+Terraform code?
+I perform drift detection by using Terraform's built-in terraform plan or 
+terraform plan -detailed-exitcode to compare the actual infrastructure state with 
+the desired configuration. In larger setups, I automate drift detection as part of 
+CI/CD or GitOps pipelines and use tools like AWS Config or driftctl for continuous visibility.
+
+### How would you handle versioning of Terraform modules across teams?
+
+I follow a structured versioning strategy using Git tags and semantic versioning for our 
+Terraform modules. Each module is developed and stored in a separate Git repository or 
+in a central monorepo with clearly defined module folders.
+
+When a module reaches a stable state, I tag it with a version like v1.0.0, and teams reference 
+that version in their configurations using the ?ref= syntax or a private Terraform registry. 
+This ensures consistency and prevents breaking changes.
+
+### How would you automate Terraform plans and applies using CI/CD
+pipelines?
+To automate Terraform plans and applies in CI/CD, I integrate Terraform into the pipeline 
+stages using tools like Jenkins, GitHub Actions, or GitLab CI. I separate the plan and apply 
+steps to enforce safe review and approvals. The pipeline handles formatting, validation, 
+planning, and gated applies using versioned remote state and secure credentials.
