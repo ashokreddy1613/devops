@@ -857,3 +857,94 @@ If you type kubectl get pods, what will happen in the backend.
 How to check the kubectl logs of a POD before it restarted
 Reverse proxy
 How will you resolve the git conflict automatically?
+
+=======================================
+Company -F5 
+ Exp--(Associate Consultant )
+
+What is Web Application Firewall,
+How would you secure the web app running in cloud from oswsap10 attacks,
+What happens if tfstate file gets deleted,
+What is terraform lock hcl file,
+What are best practices to be followed on terraform,
+If we have security group configured in the instance do we really need nacl.,
+Difference between Transit gateway and VPC,
+Best practices to be followed for cloud security.,
+HTTP request header and HTTP Methods,
+10.If thre is an instance we have security group and web application firewall enabled, DDOS attack enabled will it protect from Bot attack.
+There is db I made same entry(Name, Location) through PUT method twice what will happen.,
+Why is PUT request called idempotency in nature. If I made another entry and name is same but location is differnet then what will db store.,
+What happens if I type www.google.com in the background.,
+What is SSL/TLS Handshake.,
+15.What is DNS Resolution. Suppose I have new system with no cache what happens in the background.Step by step process.
+What is K8. Explain the architecture.,
+Can I run POD inside master-node itself?,
+Have you deployed any security application on Kubernetes?
+
+
+==========================================================================================================================================================================================
+Company -Amazon 
+ Exp--7 years ( DevOps Consultant) 
+
+If you’re migrating a monolithic application from on-prem to Cloud and the system has its local file system, which file system you will use in AWS.,
+How will you store all the configurations related to your monolithic app in Cloud,
+What are the observibility needed for app —> Monitoring, Alerting, Logging, Remediation, PD,
+If you’re not allowed to install Filebeat in your worker nodes for logging, then what will be possible option,
+What are the security protocols will be taken into consideration while designing three tier architecture.,
+DB migration, how will you sync the data,
+If DB POD is down, will it affect the data it gets stored,
+How about the sticky session data if POD gets down → Yes the session data will be lost,
+What service to use sticky session as an alternative option → redis,
+During a sticky session problem what will be the cause for LB.,
+Do you create clusters in multi regions, is it possible? If yes, then how will you manage them,
+Onboarded trading app into AWS, how will you make sure availability, scalability, security,
+How will you take a back of your entire cluster regulary ?,
+Write a python script to list the EC2 instances running in your cloud which has the tag of PROD,
+You have been tasked to create 20 EC2 per account and you been provided with 10 AWS accounts, so totally you need to create 200 EC2 machines, how will connect all these machines. Which service will be used?,
+You need to connect your DB running in private subnet, not using NAT gateway or NAT instance or bastion host, what are the other options,
+Explain about OSI model,
+Diff between directory & mount,
+Diff between local and variable in Terraform,
+You created couple of resources using Terraform, how will you make sure that resources are not modified through UI, how will you automate this check
+
+===============================================================================================================================================================================================================================
+Company -CMT
+Exp-  4-5 yrs(SRE)
+which are all the services you used in AWS
+design an high availability, fault tolerance system in aws
+what is dns
+what is tcp and udp
+what is ipv4 and ipv6
+what is pid
+how will you troubleshoot if a system goes down in Linux - tell the commands
+which are the production incidents you had attended , pls explain
+architecture of Kubernetes 
+terraform structure
+how would you maintain high availability in ecs + fargate or eks 
+what is the difference between alb and nlb, in which scenario you use alb and nlb
+in webserver/app server which metrics is used to monitor the high availability
+did you use any automation in your daily work
+what metrics is used to monitor ec2 instance cpu, memory in aws
+if there is slowness issue in decouple (SQS), how would you handle it 
+what are the best practices can be used to keep the systems highly available
+
+===================================================================================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Company-- TCS
+Exp-- 4-5 yrs (DEVOPS)
+1.what is role in ansible 
+2.how do you encrypt in ansible 
+3.what is idempotent in ansible 
+4.what is module in ansible 
+5.what is libraries in python 
+6.what are deployment group in azure devops
+7.how wl you set approvals in pipeline 
+8.difference between microsoft hosted agent and self hosted agent 
+9.what is the difference between monolithic and microservices 
+10.explain did u done any automation in your project 
+11.pls explain the flow how the pipeline will trigger across different environments 
+12.if developer is working on a code, what are all the next steps he has to do for running the pipeline along wd devops engineer 
+13.what are all the deployment startgies you use in deployments in k8s , explain canary and blue green strategies 
+14.what is devsecops  , did you use any tools for scanning image etc 
+15.what is the difference between classic pipeline and yml
+16.tell me pipeline steps for angular or java or .net 
